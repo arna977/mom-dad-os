@@ -366,10 +366,13 @@ select {
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin-top: 10px;
+  max-height: 180px;
+  overflow: auto;
 }
 
 .thumb {
   min-height: 72px;
+  cursor: pointer;
   border: 2px solid;
   border-color: var(--shadow) var(--light) var(--light) var(--shadow);
   background: linear-gradient(145deg, #9cc9eb, #76a75f);

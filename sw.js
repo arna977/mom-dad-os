@@ -1,4 +1,4 @@
-const cacheName = "mom-dad-os-v6";
+const cacheName = "mom-dad-os-v7";
 const appFiles = [
   "./",
   "./index.html",

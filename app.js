@@ -26,15 +26,12 @@ const apps = {
           <div class="photo-frame">
             <div class="family-art" role="img" aria-label="Family photo placeholder"></div>
           </div>
-          <div class="thumbnail-row">
-            <button class="thumb" aria-label="Family photo 1"></button>
-            <button class="thumb" aria-label="Family photo 2"></button>
-            <button class="thumb" aria-label="Family photo 3"></button>
+          <div class="thumbnail-row" id="photo-thumbnails">
           </div>
         </section>
         <aside class="panel">
           <h2>পরিবারের ছবি</h2>
-          <p>নতুন ছবি বেছে preview দেখা যাবে। নিজের server-এ upload backend যোগ করলে এগুলো স্থায়ী gallery হবে।</p>
+          <p>এখানে ছবি যোগ করলে এই ফোনের অ্যাপে সেভ থাকবে। পরে খুললেও gallery থেকে ছবি দেখা যাবে।</p>
           <div class="form-stack">
             <input id="photo-name" placeholder="ছবির নাম" />
             <input id="photo-file" type="file" accept="image/*" />
@@ -343,17 +340,34 @@ function bindApp(name) {
 
 function bindPhotos() {
   const frame = document.querySelector(".family-art");
-  document.querySelector("#add-photo").addEventListener("click", () => {
+  let slideshowTimer;
+  renderPhotos();
+  document.querySelector("#add-photo").addEventListener("click", async () => {
     const file = document.querySelector("#photo-file").files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      frame.style.background = `center / cover url("${reader.result}")`;
-    };
-    reader.readAsDataURL(file);
+    const title = document.querySelector("#photo-name").value.trim() || file.name;
+    await addPhotoFile({ title, name: file.name, file, savedAt: new Date().toISOString() });
+    frame.style.background = `center / cover url("${URL.createObjectURL(file)}")`;
+    document.querySelector("#photo-name").value = "";
+    document.querySelector("#photo-file").value = "";
+    renderPhotos();
   });
-  document.querySelector("#slideshow").addEventListener("click", (event) => {
-    event.currentTarget.textContent = "স্লাইডশো চলছে";
+  document.querySelector("#slideshow").addEventListener("click", async (event) => {
+    const photos = await getPhotoFiles();
+    if (!photos.length) return;
+    if (slideshowTimer) {
+      clearInterval(slideshowTimer);
+      slideshowTimer = null;
+      event.currentTarget.textContent = "স্লাইডশো চালু";
+      return;
+    }
+    let index = 0;
+    event.currentTarget.textContent = "স্লাইডশো বন্ধ";
+    frame.style.background = `center / cover url("${URL.createObjectURL(photos[index].file)}")`;
+    slideshowTimer = setInterval(() => {
+      index = (index + 1) % photos.length;
+      frame.style.background = `center / cover url("${URL.createObjectURL(photos[index].file)}")`;
+    }, 2500);
   });
 }
 
@@ -537,6 +551,31 @@ async function renderDocuments() {
     .join("");
 }
 
+async function renderPhotos() {
+  const target = document.querySelector("#photo-thumbnails");
+  const frame = document.querySelector(".family-art");
+  if (!target || !frame) return;
+  const photos = await getPhotoFiles();
+  if (!photos.length) {
+    target.innerHTML = `<button class="thumb" aria-label="No saved photo"></button>`;
+    return;
+  }
+  frame.style.background = `center / cover url("${URL.createObjectURL(photos[0].file)}")`;
+  target.innerHTML = photos
+    .map((photo) => {
+      const url = URL.createObjectURL(photo.file);
+      return `<button class="thumb" title="${escapeHtml(photo.title)}" style="background: center / cover url('${url}')" data-photo-id="${photo.id}" aria-label="${escapeHtml(photo.title)}"></button>`;
+    })
+    .join("");
+  target.querySelectorAll("[data-photo-id]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const selected = (await getPhotoFiles()).find((photo) => String(photo.id) === button.dataset.photoId);
+      if (!selected) return;
+      frame.style.background = `center / cover url("${URL.createObjectURL(selected.file)}")`;
+    });
+  });
+}
+
 async function renderAudioFiles() {
   const target = document.querySelector("#saved-audio-list");
   if (!target) return;
@@ -678,7 +717,7 @@ function loadWeather() {
 
 function openDb() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("momDadOs", 2);
+    const request = indexedDB.open("momDadOs", 3);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains("documents")) {
@@ -686,6 +725,9 @@ function openDb() {
       }
       if (!db.objectStoreNames.contains("audioFiles")) {
         db.createObjectStore("audioFiles", { keyPath: "id", autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains("photos")) {
+        db.createObjectStore("photos", { keyPath: "id", autoIncrement: true });
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -707,6 +749,14 @@ async function addAudioFile(audioRecord) {
 
 async function getAudioFiles() {
   return getDbRecords("audioFiles");
+}
+
+async function addPhotoFile(photoRecord) {
+  return addDbRecord("photos", photoRecord);
+}
+
+async function getPhotoFiles() {
+  return getDbRecords("photos");
 }
 
 async function addDbRecord(storeName, record) {

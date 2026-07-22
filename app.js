@@ -31,7 +31,6 @@ const apps = {
         </section>
         <aside class="panel">
           <h2>পরিবারের ছবি</h2>
-          <p>এখানে ছবি যোগ করলে এই ফোনের অ্যাপে সেভ থাকবে। পরে খুললেও gallery থেকে ছবি দেখা যাবে।</p>
           <div class="form-stack">
             <input id="photo-name" placeholder="ছবির নাম" />
             <input id="photo-file" type="file" accept="image/*" />

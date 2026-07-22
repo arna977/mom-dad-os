@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mom & Dad OS</title>
+    <meta name="theme-color" content="#008080" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Mom & Dad OS" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/icon-192.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="desktop" aria-label="Mom and Dad OS desktop">
+      <section class="desktop-icons" aria-label="Apps">
+        <button class="desktop-icon" data-app="photos">
+          <span class="icon-image photos-icon"></span>
+          <span>Photos</span>
+        </button>
+        <button class="desktop-icon" data-app="letters">
+          <span class="icon-image letters-icon"></span>
+          <span>Letters</span>
+        </button>
+        <button class="desktop-icon" data-app="days">
+          <span class="icon-image days-icon"></span>
+          <span>Special Days</span>
+        </button>
+        <button class="desktop-icon" data-app="surah">
+          <span class="icon-image surah-icon"></span>
+          <span>Surah & Ghazal</span>
+        </button>
+        <button class="desktop-icon" data-app="thanks">
+          <span class="icon-image thanks-icon"></span>
+          <span>Thank You</span>
+        </button>
+        <button class="desktop-icon" data-app="medicine">
+          <span class="icon-image medicine-icon"></span>
+          <span>Medicine</span>
+        </button>
+        <button class="desktop-icon" data-app="calls">
+          <span class="icon-image call-icon"></span>
+          <span>Quick Call</span>
+        </button>
+        <button class="desktop-icon" data-app="documents">
+          <span class="icon-image docs-icon"></span>
+          <span>Documents</span>
+        </button>
+        <button class="desktop-icon" data-app="today">
+          <span class="icon-image today-icon"></span>
+          <span>Today's Info</span>
+        </button>
+      </section>
+
+      <section class="window active" id="app-window" aria-live="polite">
+        <header class="titlebar">
+          <div class="title-left">
+            <span class="mini-icon"></span>
+            <span id="window-title">Mom & Dad OS</span>
+          </div>
+          <div class="window-buttons" aria-hidden="true">
+            <button id="minimize-window" title="Minimize">_</button>
+            <button id="home-window" title="Home">□</button>
+            <button id="close-window" title="Close">×</button>
+          </div>
+        </header>
+        <div class="window-content" id="window-content"></div>
+      </section>
+
+      <footer class="taskbar">
+        <button class="start-button" id="start-button">
+          <span class="start-logo"></span>
+          Start
+        </button>
+        <button class="start-button" id="language-toggle">বাংলা</button>
+        <div class="taskbar-item" id="taskbar-title">Mom & Dad OS</div>
+        <time id="clock"></time>
+      </footer>
+
+      <dialog class="welcome-dialog" id="welcome-dialog">
+        <form method="dialog" class="welcome-box">
+          <h1>Mom & Dad OS</h1>
+          <p>এই ছোট্ট ডিজিটাল পৃথিবীটা তোমাদের জন্য। তোমাদের ভালোবাসার ঋণ কখনো শোধ হবে না, কিন্তু এই অ্যাপটা সেই ভালোবাসার ছোট্ট একটা স্মৃতি। ❤️</p>
+          <button class="retro-button" id="welcome-close">শুরু করি</button>
+        </form>
+      </dialog>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
